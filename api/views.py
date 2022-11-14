@@ -5,6 +5,21 @@ from api.models import Products
 from api.serializers import ProductSerializer,ProductModelSerializer
 from rest_framework import viewsets
 
+class ProductViewsetView(viewsets.ViewSet):
+
+    def list(self,request,*args,**kw):
+        qs=Products.objects.all()
+        serializer=ProductModelSerializer(qs,many=True)
+        return Response(data=serializer.data)
+    def create(self,request,*args,**kw):
+        serializer=ProductModelSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data)
+        else:
+            return Response(data=serializer.errors)
+
+
 class ProductView(APIView):
     def get(self,request,*args,**kwargs):
         qs=Products.objects.all()
@@ -43,11 +58,5 @@ class ProductDetailsView(APIView):
 
 # ViewSets
 
-class ProductViewsetView(viewsets.ViewSet):
-
-    def list(self,request,*args,**kw):
-        qs=Products.objects.all()
-        serializer=ProductModelSerializer(qs,many=True)
-        return Response(data=serializer.data)
 
 
