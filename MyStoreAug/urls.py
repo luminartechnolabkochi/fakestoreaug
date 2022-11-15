@@ -16,12 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from api import views
-# get
-# http:8000/products/1
-#
+from rest_framework.routers import  DefaultRouter
+router=DefaultRouter()
+router.register("api/products",views.ProductViewsetView,basename="products")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("products",views.ProductView.as_view()),
     path("products/<int:id>",views.ProductDetailsView.as_view())
-]
+]+router.urls

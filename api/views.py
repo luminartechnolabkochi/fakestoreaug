@@ -19,6 +19,26 @@ class ProductViewsetView(viewsets.ViewSet):
         else:
             return Response(data=serializer.errors)
 
+    def retrieve(self,request,*args,**kw):
+        id=kw.get("pk")
+        qs=Products.objects.get(id=id)
+        serializer=ProductModelSerializer(qs,many=False)
+        return  Response(data=serializer.data)
+
+    def destroy(self,request,*args,**kw):
+        id=kw.get("pk")
+        Products.objects.filter(id=id).delete()
+        return Response(data="deleted")
+
+    def update(self,request,*args,**kw):
+        id=kw.get("pk")
+        obj=Products.objects.get(id=id)
+        serializer=ProductModelSerializer(data=request.data,instance=obj)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data)
+        else:
+            return Response(data=serializer.errors)
 
 class ProductView(APIView):
     def get(self,request,*args,**kwargs):
