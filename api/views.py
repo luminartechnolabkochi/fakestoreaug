@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from api.models import Products
 from api.serializers import ProductSerializer,ProductModelSerializer
 from rest_framework import viewsets
-
+from rest_framework.decorators import action
 class ProductViewsetView(viewsets.ViewSet):
 
     def list(self,request,*args,**kw):
@@ -39,6 +39,10 @@ class ProductViewsetView(viewsets.ViewSet):
             return Response(data=serializer.data)
         else:
             return Response(data=serializer.errors)
+    @action(methods=["GET"],detail=False)
+    def categories(self,request,*args,**kwargs):
+        res=Products.objects.values_list("category",flat=True).distinct()
+        return Response(data=res)
 
 class ProductView(APIView):
     def get(self,request,*args,**kwargs):
@@ -75,8 +79,11 @@ class ProductDetailsView(APIView):
         Products.objects.filter(id=id).delete()
         return Response(data="object deleted")
 
-
+# authentication and permissions
 # ViewSets
 
+# user
+# cart
+# products
 
 
