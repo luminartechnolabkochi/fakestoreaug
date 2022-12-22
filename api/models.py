@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 class Products(models.Model):
 
     name=models.CharField(max_length=200)
@@ -8,39 +8,76 @@ class Products(models.Model):
     category=models.CharField(max_length=200)
     image=models.ImageField(null=True,upload_to="images")
 
+    @property
+    def avg_rating(self):
+        ratings=self.reviews_set.all().values_list("rating",flat=True)
+        if ratings:
+            return sum(ratings)/len(ratings)
+        else:
+            return  0
+
+    @property
+    def review_count(self):
+        ratings=self.reviews_set.all().values_list("rating",flat=True)
+        if ratings:
+            return len(ratings)
+        else:
+            return 0
+
+
+
     def __str__(self):
         return self.name
 
+class Carts(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    product=models.ForeignKey(Products,on_delete=models.CASCADE)
+    date=models.DateTimeField(auto_now_add=True)
 
 
-# ORM
-# orm for creating a resourse
-#modelname.objects.create(field1=value1,field2=value2,,,,,)
-#Products.objects.create(name="samsunga72",price=32000,description="mobile",category="electronics")
+from django.core.validators import  MaxValueValidator,MinValueValidator
+
+class Reviews(models.Model):
+
+    product=models.ForeignKey(Products,on_delete=models.CASCADE)
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    rating=models.PositiveIntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])
+    comment=models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.comment
+    # python manage.py makemigrations
+    # python manage.py migrate
 
 
-# ORM query for fetching all records
-#qs=modelname.objects.all()
-#
-#ORM filter queries
-# qs=modelname.objects.filter(category="electronics")
+
+# token:
 
 
-# qs=Products.objects.all().exclude(category="electronics")
-
-# orm query for fetching a specific record
-# qs=modelname.objects.get(id=1)
 
 
-# price > 25000
-# qs=Products.objects.filter(price__lt=2500) lessthan
-#__lt <
-# __lte <=
-#__gt >
-# __gte >=
-
-# products in range of 20000 to 30000 ?
 
 
-# return all categories
-# Products.objects.values_list('category')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

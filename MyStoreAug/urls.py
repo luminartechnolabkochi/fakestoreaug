@@ -17,11 +17,16 @@ from django.contrib import admin
 from django.urls import path
 from api import views
 from rest_framework.routers import  DefaultRouter
+from rest_framework.authtoken.views import obtain_auth_token
 router=DefaultRouter()
 router.register("api/products",views.ProductViewsetView,basename="products")
-
+router.register("carts",views.CartsView,basename="carts")
+router.register("users",views.UsersView,basename="users")
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("products",views.ProductView.as_view()),
-    path("products/<int:id>",views.ProductDetailsView.as_view())
+    path("reviews/<int:pk>",views.ReviewDeleteView.as_view()),
+    path("token/",obtain_auth_token)
+    # path("products",views.ProductView.as_view()),
+    # path("products/<int:id>",views.ProductDetailsView.as_view())
+    
 ]+router.urls

@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'rest_framework',
-    'carts'
+    'carts',
+    'rest_framework.authtoken',
+    'owner'
 ]
 #ORM(object relational mapping)
 
