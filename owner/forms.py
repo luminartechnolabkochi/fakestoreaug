@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import  User
+from api.models import Products
 
 class LoginForm(forms.Form):
     username=forms.CharField()
@@ -10,3 +11,8 @@ class RegistrationForm(forms.ModelForm):
     class Meta:
         model=User
         fields=["first_name","email","username","password"]
+    # def clean()
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model=Products
+        fields="__all__"

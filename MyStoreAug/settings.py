@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'carts',
     'rest_framework.authtoken',
-    'owner'
+    'owner',
+    'customer'
 ]
 #ORM(object relational mapping)
 

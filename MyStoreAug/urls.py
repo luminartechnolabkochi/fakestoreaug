@@ -26,7 +26,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("reviews/<int:pk>",views.ReviewDeleteView.as_view()),
     path("token/",obtain_auth_token),
-    path("owner/",include("owner.urls"))
+    path("owner/",include("owner.urls")),
+    path("",include("customer.urls"))
     # path("products",views.ProductView.as_view()),
     # path("products/<int:id>",views.ProductDetailsView.as_view())
     

@@ -1,8 +1,8 @@
 from django.shortcuts import render
-
+from django.contrib.auth.models import User
 # Create your views here
 from django.views.generic import View
-from owner.forms import  LoginForm,RegistrationForm
+from owner.forms import  LoginForm,RegistrationForm,ProductForm
 
 class HomeView(View):
 
@@ -17,6 +17,26 @@ class SignUpView(View):
         form=RegistrationForm()
 
         return render(request,"register.html",{"form":form})
+    def post(self,request,*args,**kwargs):
+        form=RegistrationForm(request.POST)
+        if form.is_valid():
+            User.objects.create_user(**form.cleaned_data)
+            return render(request,"login.html")
+        else:
+            return render(request,"register.html",{"form":form})
+
+
+class ProductCreateView(View):
+    def get(self,request,*args,**kwargs):
+        form=ProductForm()
+        return render(request,"product-add.html",{"form":form})
+    def post(self,request,*args,**kwargs):
+        form=ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return render(request,"home.html")
+        else:
+            return render(request, "product-add.html", {"form": form})
 
 class SignInView(View):
     def get(self,request,*args,**kw):
