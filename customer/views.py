@@ -1,8 +1,10 @@
-from django.shortcuts import render
-from django.views.generic import CreateView
+from django.shortcuts import render,redirect
+from django.views.generic import CreateView,FormView,TemplateView,ListView
 from django.urls import reverse_lazy
-from customer.forms import RegistrationForm
+from customer.forms import RegistrationForm,LoginForm
+from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
+from api.models import Products
 
 class SignUpView(CreateView):
     template_name="signup.html"
@@ -17,3 +19,27 @@ class SignUpView(CreateView):
         messages.error(self.request,"account creation failed")
 
         return super().form_invalid(form)
+
+
+class SigninView(FormView):
+    template_name="cust-login.html"
+    form_class=LoginForm
+    def post(self,request,*args,**kwargs):
+        form=LoginForm(request.POST)
+        if form.is_valid():
+            uname=form.cleaned_data.get("username")
+            pwd=form.cleaned_data.get("password")
+            usr=authenticate(request,username=uname,password=pwd)
+            if usr:
+                login(request,usr)
+                return redirect("user-home")
+            else:
+                messages.error(request,"invalid credentials")
+                return render(request,"cust-login.html",{"form":form})
+
+class HomeView(ListView):
+    template_name="cust-index.html"
+    context_object_name="products"
+    model=Products
+
+
