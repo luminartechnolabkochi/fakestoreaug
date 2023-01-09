@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.views.generic import CreateView,FormView,TemplateView,ListView
+from django.views.generic import CreateView,FormView,TemplateView,ListView,DetailView
 from django.urls import reverse_lazy
 from customer.forms import RegistrationForm,LoginForm
 from django.contrib.auth import authenticate,login,logout
@@ -43,3 +43,9 @@ class HomeView(ListView):
     model=Products
 
 
+
+class ProductDetailView(DetailView):
+    template_name="cust-productdetail.html"
+    context_object_name="product"
+    pk_url_kwarg="id"
+    
