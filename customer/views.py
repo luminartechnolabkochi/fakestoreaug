@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from customer.forms import RegistrationForm,LoginForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from api.models import Products
+from api.models import Products,Carts
 
 class SignUpView(CreateView):
     template_name="signup.html"
@@ -48,4 +48,13 @@ class ProductDetailView(DetailView):
     template_name="cust-productdetail.html"
     context_object_name="product"
     pk_url_kwarg="id"
-    
+    model=Products
+
+
+def addto_cart(request,*args,**kwargs):
+    id=kwargs.get("id")
+    product=Products.objects.get(id=id)
+    user=request.user
+    Carts.objects.create(user=user,product=product)
+    messages.success(request,"item hasbeen added to cart")
+    return redirect("user-home")
