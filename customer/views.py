@@ -58,3 +58,16 @@ def addto_cart(request,*args,**kwargs):
     Carts.objects.create(user=user,product=product)
     messages.success(request,"item hasbeen added to cart")
     return redirect("user-home")
+
+
+class CartListView(ListView):
+    template_name="cart-list.html"
+    model=Carts
+    context_object_name="carts"
+
+    def get_queryset(self):
+        return Carts.objects.filter(user=self.request.user)
+
+
+
+# form_valid(),get_query_set()
