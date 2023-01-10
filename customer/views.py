@@ -5,6 +5,7 @@ from customer.forms import RegistrationForm,LoginForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from api.models import Products,Carts
+from django.db.models import Sum
 
 class SignUpView(CreateView):
     template_name="signup.html"
@@ -65,8 +66,13 @@ class CartListView(ListView):
     model=Carts
     context_object_name="carts"
 
-    def get_queryset(self):
-        return Carts.objects.filter(user=self.request.user)
+    def get(self,request,*args,**kwargs):
+        qs=Carts.objects.filter(user=request.user)
+        total=Carts.objects.filter(user=request.user).aggregate(tot=Sum("products__price"))
+        return render(request,"cart-list.html",{"carts":qs,"total":total})
+
+    # def get_queryset(self):
+    #     return Carts.objects.filter(user=self.request.user)
 
 
 
