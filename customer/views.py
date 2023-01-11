@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from customer.forms import RegistrationForm,LoginForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from api.models import Products,Carts
+from api.models import Products,Carts,Orders
 from django.db.models import Sum
 
 class SignUpView(CreateView):
@@ -68,7 +68,7 @@ class CartListView(ListView):
 
     def get(self,request,*args,**kwargs):
         qs=Carts.objects.filter(user=request.user)
-        total=Carts.objects.filter(user=request.user).aggregate(tot=Sum("products__price"))
+        total=Carts.objects.filter(user=request.user).aggregate(tot=Sum("product__price"))
         return render(request,"cart-list.html",{"carts":qs,"total":total})
 
     # def get_queryset(self):
@@ -77,3 +77,25 @@ class CartListView(ListView):
 
 
 # form_valid(),get_query_set()
+
+
+class OrderView(TemplateView):
+    template_name="chekout.html"
+    def get(self,request,*args,**kwargs):
+        pid=kwargs.get("pid")
+        qs=Products.objects.get(id=pid)
+        return render(request,"chekout.html",{"product":qs,"cid":kwargs.get("cid"),"pid":pid})
+    def post(self,request,*args,**kwargs):
+        cid=kwargs.get("cid")
+        pid=kwargs.get("pid")
+        cart=Carts.objects.get(id=cid)
+        product=Products.objects.get(id=pid)
+        user=request.user
+        mobile=request.POST.get("mobile")
+        address=request.POST.get("address")
+        Orders.objects.create(product=product,user=user,address=address,phone=mobile)
+        cart.status="order-placed"
+        cart.save()
+        messages.success(request,"your order hasbenn placed")
+        return redirect("user-home")
+

@@ -7,5 +7,6 @@ urlpatterns=[
     path("customers/home",views.HomeView.as_view(),name="user-home"),
     path("products/details/<int:id>",views.ProductDetailView.as_view(),name="product-detail"),
     path("products/carts/<int:id>/add",views.addto_cart,name="add-cart"),
-    path("carts/all",views.CartListView.as_view(),name="cart-list")
+    path("carts/all",views.CartListView.as_view(),name="cart-list"),
+    path("orders/add/<int:cid>/<int:pid>",views.OrderView.as_view(),name="place-order")
 ]

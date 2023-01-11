@@ -33,6 +33,14 @@ class Carts(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     product=models.ForeignKey(Products,on_delete=models.CASCADE)
     date=models.DateTimeField(auto_now_add=True)
+    options=(
+        ("order-placed","order-placed"),
+        ("in-cart","in-cart"),       
+        ("cancelled","cancelled")
+    )
+    status=models.CharField(max_length=200,choices=options,default="in-cart")
+
+
 
 
 from django.core.validators import  MaxValueValidator,MinValueValidator
@@ -52,6 +60,20 @@ class Reviews(models.Model):
 
 
 # token:
+
+class Orders(models.Model):
+    product=models.ForeignKey(Products,on_delete=models.CASCADE)
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    options=(
+        ("order-placed","order-placed"),
+        ("despathed","despatched"),
+        ("in-transit","in-transit"),
+        ("cancelled","cancelled")
+    )
+    status=models.CharField(max_length=200,choices=options,default="order-placed")
+    date=models.DateField(auto_now_add=True)
+    address=models.CharField(max_length=250)
+    phone=models.CharField(max_length=20)
 
 
 
