@@ -6,6 +6,19 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from api.models import Products,Carts,Orders
 from django.db.models import Sum
+from django.views.decorators.cache import never_cache
+from django.utils.decorators import method_decorator
+
+def signin_required(fn):
+    def wrapper(request,*args,**kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request,"invalid seesion")
+            return redirect("signin")
+        else:
+            return fn(request,*args,**kwargs)
+    return wrapper
+
+decs=[signin_required,never_cache]
 
 class SignUpView(CreateView):
     template_name="signup.html"
@@ -37,21 +50,21 @@ class SigninView(FormView):
             else:
                 messages.error(request,"invalid credentials")
                 return render(request,"cust-login.html",{"form":form})
-
+@method_decorator(decs,name="dispatch")
 class HomeView(ListView):
     template_name="cust-index.html"
     context_object_name="products"
     model=Products
 
 
-
+@method_decorator(decs,name="dispatch")
 class ProductDetailView(DetailView):
     template_name="cust-productdetail.html"
     context_object_name="product"
     pk_url_kwarg="id"
     model=Products
 
-
+decs
 def addto_cart(request,*args,**kwargs):
     id=kwargs.get("id")
     product=Products.objects.get(id=id)
@@ -60,15 +73,15 @@ def addto_cart(request,*args,**kwargs):
     messages.success(request,"item hasbeen added to cart")
     return redirect("user-home")
 
-
+@method_decorator(decs,name="dispatch")
 class CartListView(ListView):
     template_name="cart-list.html"
     model=Carts
     context_object_name="carts"
 
     def get(self,request,*args,**kwargs):
-        qs=Carts.objects.filter(user=request.user)
-        total=Carts.objects.filter(user=request.user).aggregate(tot=Sum("product__price"))
+        qs=Carts.objects.filter(user=request.user,status="in-cart")
+        total=Carts.objects.filter(user=request.user,status="in-cart").aggregate(tot=Sum("product__price"))
         return render(request,"cart-list.html",{"carts":qs,"total":total})
 
     # def get_queryset(self):
@@ -78,7 +91,7 @@ class CartListView(ListView):
 
 # form_valid(),get_query_set()
 
-
+@method_decorator(decs,name="dispatch")
 class OrderView(TemplateView):
     template_name="chekout.html"
     def get(self,request,*args,**kwargs):
@@ -99,3 +112,24 @@ class OrderView(TemplateView):
         messages.success(request,"your order hasbenn placed")
         return redirect("user-home")
 
+@method_decorator(decs,name="dispatch")
+class MyOrdersView(ListView):
+    model=Orders
+    template_name="order-list.html"
+    context_object_name="orders"
+
+    def get_queryset(self):
+        return Orders.objects.filter(user=self.request.user)
+
+    
+decs
+def cancelorder_view(request,*args,**kwargs):
+    id=kwargs.get("id")
+    Orders.objects.filter(id=id).update(status="cancelled")
+    messages.success(request,"oredr has been removed")
+    return redirect("user-home")
+decs
+def logout_view(request,*args,**kwargs):
+    logout(request)
+    messages.success(request,"logged out")
+    return redirect("signin")
